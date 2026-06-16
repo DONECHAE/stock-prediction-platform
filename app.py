@@ -430,7 +430,19 @@ fig.add_trace(
 # PREDICTION LINE
 # =====================================================
 
-for model_name, pred in predictions.items():
+label_positions = [
+    "top right",
+    "top left",
+    "bottom right",
+    "bottom left"
+]
+
+for i, (model_name, pred) in enumerate(predictions.items()):
+
+    # Slightly offset the end point so labels do not overlap when several
+    # models produce the same predicted value.
+    offset_days = i * pd.Timedelta(days=0.4)
+    offset_x = future_date + offset_days
 
     fig.add_trace(
 
@@ -438,7 +450,7 @@ for model_name, pred in predictions.items():
 
             x=[
                 last_date,
-                future_date
+                offset_x
             ],
 
             y=[
@@ -452,7 +464,6 @@ for model_name, pred in predictions.items():
                 size=10
             ),
 
-            # Use dashed lines as requested ("좀 멀리 점선으로 표시")
             line=dict(
                 width=3,
                 dash="dash"
@@ -463,7 +474,7 @@ for model_name, pred in predictions.items():
                 f"{model_name} ({pred:,.0f})"
             ],
 
-            textposition="top right",
+            textposition=label_positions[i % len(label_positions)],
 
             name=model_name
 
